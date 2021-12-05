@@ -20,22 +20,19 @@ main = do
   -- life support rating is oxy * scrub
   print ((readBin oxyRating) * (readBin scrubRating))
 
-
-
 bitScrub :: [String] -> Int -> ((Char, Char) -> Char) -> String
 bitScrub rows@(x:xs) bitPosition selectorFn
   | bitPosition > length x = error "no result"
   | length xs == 0         = x
   | otherwise              = bitScrub nextRows (bitPosition + 1) selectorFn
   where
-    nextRows = filter matchBitCriteria rows
-    selector = selectorFn $ mostLeastCommon $ (transpose rows) !! bitPosition
+    nextRows             = filter matchBitCriteria rows
+    selector             = selectorFn $ mostLeastCommon $ (transpose rows) !! bitPosition
     matchBitCriteria row = (row !! bitPosition) == selector
-
 
 mostLeastCommon :: [Char] -> (Char, Char)
 mostLeastCommon set = if zero > one then ('0', '1') else ('1', '0')
   where
-    zero = head counts
-    one = head $ tail counts
+    zero   = head counts
+    one    = head $ tail counts
     counts = map length $ (group . sort) set
