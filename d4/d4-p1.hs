@@ -1,6 +1,18 @@
-
+import qualified Data.Text as T
 import Data.List
 import Data.Maybe (maybeToList)
+
+main = do
+  contents <- lines <$> readFile "input.txt"
+  let calledNumbers = head contents
+  let nums = map (\t -> (read :: String -> Int) (T.unpack t)) $ T.splitOn (T.pack ",") (T.pack calledNumbers)
+  let boards = parseBoards (drop 2 contents)
+  print $ (show (length calledNumbers)) ++ " Numbers"
+  print $ (show (length boards)) ++ " Boards"
+  let res = findWinners boards nums
+  print res
+  let scores = scoreBoards res
+  print scores
 
 -- board is square 2d list of pairs - [[(number, selected (bool))]]
 newtype Board = Board { boardState :: [[(Int, Bool)]] }
@@ -47,4 +59,22 @@ scoreBoards :: Maybe (Int, [Board]) -> [Int]
 scoreBoards Nothing = []
 scoreBoards (Just (lastNum, boards)) = map (\b -> (unmarkedNumberSum b) * lastNum) boards
   where
-    unmarkedNumberSum b = sum $ map (\row -> sum (map (\(n, iss) -> if iss then n else 0) row)) (boardState b)
+    unmarkedNumberSum b = sum $ map (\row -> sum (map (\(n, iss) -> if iss then 0 else n) row)) (boardState b)
+
+-- simplifying this for now assuming 5x5
+parseBoards :: [String] -> [Board]
+parseBoards input = map Board boardStructures
+  where
+    boardSets = map (take 5) (chunksOf 6 input)
+    boardNumberSets = map (\board -> map (\r -> map (read :: String -> Int) (words r)) board) boardSets
+    boardStructures = map (\bs -> map (\r -> map (\e -> (e, False)) r) bs ) boardNumberSets
+
+
+-- from Data.List.Split, not in my ghc distribution right now
+chunksOf :: Int -> [e] -> [[e]]
+chunksOf i ls = map (take i) (build (splitter ls)) where
+  splitter :: [e] -> ([e] -> a -> a) -> a -> a
+  splitter [] _ n = n
+  splitter l c n  = l `c` splitter (drop i l) c n
+  build :: ((a -> [a] -> [a]) -> [a] -> [a]) -> [a]
+  build g = g (:) []
