@@ -44,4 +44,6 @@ parseLineSegment input = constructLS $ arrHalves
                                     -- points = buildPoints lar }
 
 scribedMap :: [LineSegment] -> Map
-scribedMap segments = buildMap $ filter (\s -> isHoriz s || isVert s) segments
+-- This was for Part 1, for Part 2 we don't subset
+-- scribedMap segments = buildMap $ filter (\s -> isHoriz s || isVert s) segments
+scribedMap = buildMap
